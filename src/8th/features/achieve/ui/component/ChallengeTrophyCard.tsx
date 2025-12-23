@@ -90,7 +90,7 @@ export default function ChallengeTrophyCard({
           alignItems="center"
           justifyContent="center"
           className="challenge-award-name">
-          <span>{t('t8th199')}</span>
+          {t('t8th199')}
         </BoxStyle>
       )}
       {isChallengeTrophyModalOpen && (

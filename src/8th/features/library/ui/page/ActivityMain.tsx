@@ -228,6 +228,27 @@ function RecentReviewList({ reviewBooks }: { reviewBooks: HistoryStudy[] }) {
   // @Language 'common'
   const { t } = useTranslation()
 
+  const formatDateToNumericEnglish = (dateString: string): string => {
+    try {
+      // 날짜 형식이 "YYYY-MM-DD" 또는 "YYYYMMDD"인 경우를 가정
+      let dateStr = dateString
+      if (dateString.length === 8 && !dateString.includes('-')) {
+        // YYYYMMDD 형식을 YYYY-MM-DD로 변환
+        dateStr = `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`
+      }
+      const date = new Date(dateStr)
+      if (isNaN(date.getTime())) {
+        return dateString // 파싱 실패 시 원본 반환
+      }
+      // 월: 영어 약어, 일: 숫자, 년: 생략 (예: "Jan 15")
+      const month = date.toLocaleDateString('en-US', { month: 'short' })
+      const day = date.getDate()
+      return `${month} ${day}`
+    } catch {
+      return dateString // 에러 발생 시 원본 반환
+    }
+  }
+
   const student = useStudent()
   const { mutate: exportVocabulary } = useExportVocabulary()
   const { mutate: exportReport } = useExportReport()
@@ -408,7 +429,7 @@ function RecentReviewList({ reviewBooks }: { reviewBooks: HistoryStudy[] }) {
                 title={history.title}
                 levelName={history.levelName}
                 src={history.surfaceImagePath}
-                studyDate={history.completeDate}
+                studyDate={formatDateToNumericEnglish(history.completeDate)}
                 totalScore={history.average}
                 stepScore1={history.scoreStep1}
                 stepScore2={history.scoreStep2}

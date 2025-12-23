@@ -264,6 +264,23 @@ function BookList() {
     }
   }
 
+  const formatDateToEnglish = (dateString: string): string => {
+    try {
+      // 날짜 형식이 "YYYY-MM-DD"인 경우를 가정
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return dateString // 파싱 실패 시 원본 반환
+      }
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    } catch {
+      return dateString // 에러 발생 시 원본 반환
+    }
+  }
+
   const searchCount = todo.data?.count || 0
   const downloadExcelUrl = searchCount > 0 ? todo.data?.download : undefined
   const allTodos = todo.data?.todo || []
@@ -277,7 +294,7 @@ function BookList() {
       .filter((date, index, self) => self.indexOf(date) === index)
     dates.forEach((date) => {
       groupTodos.push({
-        group: date,
+        group: formatDateToEnglish(date),
         todos: allTodos.filter((todo) => todo.openDate === date),
       })
     })
@@ -398,14 +415,13 @@ function BookList() {
       {searchCount > 0 && groupTodos.length === 0 && (
         <BookListView
           todos={allTodos.map((book) => {
-            let isCheckable = isExportMode
-            if (isExportMode && exportMode === 'EditDelete') {
-              isCheckable = book.deleteYn
-            }
+            const isEditMode = exportMode === 'EditDelete'
             return {
               ...book,
-              isCheckable: isExportMode,
-              isChecked: isCheckable && isSelectedItem(book.studyId),
+              isCheckable: isEditMode,
+              isChecked:
+                isEditMode && book.deleteYn && isSelectedItem(book.studyId),
+              disabled: isEditMode && !book.deleteYn,
             }
           })}
           onBookClick={onShowBookInfo}
@@ -415,21 +431,22 @@ function BookList() {
         groupTodos.length > 0 &&
         groupTodos.map((item) => {
           return (
-            <BookListDateGroupStyle key={item.group}>
+            <BookListDateGroupStyle key={item.group} isTodoList={true}>
               <TextStyle fontSize="medium" fontColor="secondary">
-                {`+${item.group}`}
+                {`+ ${item.group}`}
               </TextStyle>
-              <Gap size={25} />
+              <Gap size={15} />
               <BookListView
                 todos={item.todos.map((book) => {
-                  let isCheckable = isExportMode
-                  if (isExportMode && exportMode === 'EditDelete') {
-                    isCheckable = book.deleteYn
-                  }
+                  const isEditMode = exportMode === 'EditDelete'
                   return {
                     ...book,
-                    isCheckable: isExportMode,
-                    isChecked: isCheckable && isSelectedItem(book.studyId),
+                    isCheckable: isEditMode,
+                    isChecked:
+                      isEditMode &&
+                      book.deleteYn &&
+                      isSelectedItem(book.studyId),
+                    disabled: isEditMode && !book.deleteYn,
                   }
                 })}
                 onBookClick={onShowBookInfo}
@@ -468,7 +485,11 @@ function BookListView({
   todos,
   onBookClick,
 }: {
-  todos: (TodoBook & { isCheckable: boolean; isChecked: boolean })[]
+  todos: (TodoBook & {
+    isCheckable: boolean
+    isChecked: boolean
+    disabled?: boolean
+  })[]
   onBookClick: (studyId: string, isCheckable: boolean) => void
 }) {
   return (
@@ -486,6 +507,8 @@ function BookListView({
             levelName={book.levelName}
             isCheckable={book.isCheckable}
             isChecked={book.isChecked}
+            disabled={book.disabled}
+            inProgressIcon={Assets.Icon.Study.inProgressMarkInTodo}
             onClick={() => {
               onBookClick(book.studyId, book.isCheckable)
             }}

@@ -50,11 +50,7 @@ export default function StudentInfoCard({
         />
       </BoxStyle>
       <BoxStyle className="info-container">
-        <BoxStyle
-          display="flex"
-          flexDirection="column"
-          alignItems="flex-start"
-          gap={10}>
+        <BoxStyle className="info-content-container">
           <div className="user-name">{name}</div>
           <BoxStyle
             display="flex"

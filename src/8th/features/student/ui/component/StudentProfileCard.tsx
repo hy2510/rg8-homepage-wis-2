@@ -41,7 +41,7 @@ export default function StudentProfileCard({
   const router = useRouter()
 
   return (
-    <WidgetBoxStyle>
+    <WidgetBoxStyle height="256px">
       <StudentProfileCardStyle>
         <div
           className="header"
@@ -67,8 +67,8 @@ export default function StudentProfileCard({
             <Image
               src={Assets.Icon.Side.booksRead}
               alt=""
-              width={34}
-              height={34}
+              width={28}
+              height={28}
             />
             {t('t8th266')}
           </div>
@@ -77,14 +77,14 @@ export default function StudentProfileCard({
             <Image
               src={Assets.Icon.Side.earnedPoints}
               alt=""
-              width={34}
-              height={34}
+              width={28}
+              height={28}
             />
             {t('t8th267')}
           </div>
           <div className="value">{NumberUtils.toRgDecimalPoint(point)}P</div>
           <div className="label">
-            <Image src={Assets.Icon.Side.toDo} alt="" width={34} height={34} />
+            <Image src={Assets.Icon.Side.toDo} alt="" width={28} height={28} />
             {t('t8th268')}
           </div>
           <div
@@ -96,8 +96,8 @@ export default function StudentProfileCard({
             <Image
               src={Assets.Icon.Side.favorite}
               alt=""
-              width={34}
-              height={34}
+              width={28}
+              height={28}
             />
             {t('t8th269')}
           </div>

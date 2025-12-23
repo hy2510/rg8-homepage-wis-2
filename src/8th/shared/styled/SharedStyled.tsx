@@ -564,14 +564,19 @@ export const HiddenCheckboxStyle = styled.input`
   pointer-events: none;
 `
 
-export const CheckboxStyle = styled.div<{ checked: boolean }>`
+export const CheckboxStyle = styled.div<{ checked: boolean; disabled?: boolean }>`
   width: 20px;
   height: 20px;
-  cursor: pointer;
-  border: 2px solid var(--font-color-light-blue);
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  border: 2px solid ${({ disabled }) =>
+    disabled ? 'var(--line-color-gray)' : 'var(--font-color-light-blue)'};
   border-radius: 5px;
-  background-color: ${({ checked }) =>
-    checked ? 'var(--font-color-light-blue)' : '#fff'};
+  background-color: ${({ checked, disabled }) =>
+    disabled
+      ? '#f5f5f5'
+      : checked
+        ? 'var(--font-color-light-blue)'
+        : '#fff'};
   position: relative;
   transition: all 0.2s ease;
   display: flex;
@@ -580,9 +585,11 @@ export const CheckboxStyle = styled.div<{ checked: boolean }>`
   color: #fff;
   font-size: 16px;
   font-weight: bold;
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 
   &:hover {
-    border-color: var(--font-color-light-blue);
+    border-color: ${({ disabled }) =>
+      disabled ? 'var(--line-color-gray)' : 'var(--font-color-light-blue)'};
   }
 `
 
@@ -890,7 +897,8 @@ export const GlobalNavBarStyle = styled.div<{ zIndex?: number }>`
   top: 0;
   left: 0;
   z-index: ${({ zIndex }) => zIndex || 100};
-  padding: 30px;
+  padding: 10px;
+  padding-top: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -938,7 +946,7 @@ export const GlobalNavBarStyle = styled.div<{ zIndex?: number }>`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 20px 10px;
+    padding: 10px;
     width: 100%;
 
     ${labtopS(`
@@ -1794,9 +1802,11 @@ export const PagenationItemStyle = styled.div`
 export const WidgetBoxStyle = styled.div<{
   getAward?: boolean
   todayGoal?: boolean
+  height?: string
 }>`
   width: 100%;
-  min-height: fit-content;
+  min-height: ${({ height }) => height || 'fit-content'};
+  height: ${({ height }) => height || 'auto'};
   background-color: ${({ getAward, todayGoal }) =>
     getAward ? '#3C4B62' : todayGoal ? '#FFCA2B' : '#fff'};
   border-radius: 20px;

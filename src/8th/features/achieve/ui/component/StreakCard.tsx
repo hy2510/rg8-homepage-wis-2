@@ -34,7 +34,7 @@ export function StreakCardClassic({
   const { t } = useTranslation()
 
   return (
-    <WidgetBoxStyle>
+    <WidgetBoxStyle height="168px">
       <StreakCardStyle>
         <CommonTitleStyle noLink>{t('t8th253')}</CommonTitleStyle>
         <BoxStyle
@@ -87,7 +87,7 @@ export default function StreakCard({
 
   return (
     <>
-      <WidgetBoxStyle getAward={streakStatus === 'award'}>
+      <WidgetBoxStyle getAward={streakStatus === 'award'} height="168px">
         <StreakCardStyle>
           <CommonTitleStyle
             onClick={() => setIsModalOpen(true)}

@@ -47,8 +47,9 @@ export default function DailyRGSection({
   return (
     <DailyRGCourseContainerStyle ref={ref}>
       <DailyRGCourseStyle
-        bgColor={isCompleted ? '#3C4B62' : bgColor}
-        isCurrent={isActive}>
+        bgColor={isCompleted ? '#FFCA2B' : bgColor}
+        isCurrent={isActive}
+        isCompleted={isCompleted}>
         <ProgressBarContainerStyle>
           <TextStyle
             fontColor={isActive || isCompleted ? '#fff' : 'secondary'}
@@ -76,28 +77,18 @@ export default function DailyRGSection({
                 bottom: '-5px',
                 right: '5px',
                 zIndex: 1,
-                opacity: 0.7,
               }}
             />
           )}
         </ProgressBarContainerStyle>
-        <BoxStyle
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          gap={5}
-          position="relative"
-          borderLeft="1.5px solid #fff"
-          zIndex={1}
-          onClick={onSectionClick}>
-          {isActive ? (
+        <BoxStyle className="menu-box" onClick={onSectionClick}>
+          {isActive || isCompleted ? (
             <Image src={Assets.Icon.menuWhite} alt="menu" />
           ) : (
             <Image src={Assets.Icon.menuGray} alt="menu" />
           )}
           <TextStyle
-            fontColor={isActive ? '#fff' : 'secondary'}
+            fontColor={isActive || isCompleted ? '#fff' : 'secondary'}
             fontSize="0.7em">
             {completedCount}/{totalCount}
           </TextStyle>

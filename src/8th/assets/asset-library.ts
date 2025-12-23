@@ -152,6 +152,7 @@ import toDo from './images/icons/side/to-do.png'
 import checkMarkGoldTwin from './images/icons/study/check-mark-gold-twin.png'
 import checkMarkGold from './images/icons/study/check-mark-gold.png'
 import collections from './images/icons/study/collections.png'
+import inProgressMarkInTodo from './images/icons/study/in-progress-mark-in-todo.png'
 import inProgressMark from './images/icons/study/in-progress-mark.png'
 import leveledReading from './images/icons/study/leveled-reading.png'
 import recentlyViewed from './images/icons/study/recently-viewed.png'
@@ -250,6 +251,7 @@ export const Assets = {
       checkMarkGoldTwin: checkMarkGoldTwin,
       checkMarkGold: checkMarkGold,
       inProgressMark: inProgressMark,
+      inProgressMarkInTodo: inProgressMarkInTodo,
       leveledReading: leveledReading,
       recentlyViewed: recentlyViewed,
       collections: collections,

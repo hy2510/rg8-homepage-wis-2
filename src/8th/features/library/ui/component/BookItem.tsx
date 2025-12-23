@@ -4,7 +4,7 @@ import { Assets } from '@/8th/assets/asset-library'
 import { BookItemStyle } from '@/8th/shared/styled/FeaturesStyled'
 import CustomCheckbox from '@/8th/shared/ui/CustomCheckbox'
 import NumberUtils from '@/util/number-utils'
-import Image from 'next/image'
+import Image, { StaticImageData } from 'next/image'
 import { useState } from 'react'
 
 /**
@@ -21,6 +21,8 @@ export interface BookItemProps {
   levelName: string
   isCheckable?: boolean
   isChecked?: boolean
+  disabled?: boolean
+  inProgressIcon?: StaticImageData
   onClick?: () => void
 }
 
@@ -34,6 +36,8 @@ export default function BookItem({
   levelName,
   isCheckable,
   isChecked,
+  disabled,
+  inProgressIcon = Assets.Icon.Study.inProgressMark,
   onClick,
 }: BookItemProps) {
   const [isCopied, setIsCopied] = useState(false)
@@ -85,15 +89,16 @@ export default function BookItem({
                 className="check-box-position animate__animated animate__bounce"
                 onClick={(e) => {
                   e.stopPropagation()
-                  if (onClick) {
+                  if (!disabled && onClick) {
                     onClick()
                   }
                 }}>
                 <CustomCheckbox
                   id="book-item-checkbox"
                   checked={isChecked}
+                  disabled={disabled}
                   onChange={(checked) => {
-                    if (onClick) {
+                    if (!disabled && onClick) {
                       onClick()
                     }
                   }}
@@ -104,7 +109,7 @@ export default function BookItem({
               {/* To-Do에 추가된 도서 */}
               {addYn && (
                 <Image
-                  src={Assets.Icon.Study.inProgressMark}
+                  src={inProgressIcon}
                   alt="badge"
                   width={40}
                   height={40}

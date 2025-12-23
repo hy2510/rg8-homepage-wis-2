@@ -44,6 +44,7 @@ export default function DailyGoalCard({
   return (
     <>
       <WidgetBoxStyle
+        height="168px"
         todayGoal={dailyGoalStatus === 'complete'}
         getAward={dailyGoalStatus === 'award'}>
         {dailyGoalStatus === 'running' && (

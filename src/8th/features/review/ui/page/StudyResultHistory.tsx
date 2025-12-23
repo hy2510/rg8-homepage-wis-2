@@ -194,24 +194,75 @@ function StudyResultHistoryList({
   const summary = allHistory.data?.pages[0].summary
   const performanceReportUrl = allHistory.data?.pages[0].performanceReport
 
-  const dateOrderList: { id: string; date: string; list: HistoryStudy[] }[] = []
+  const formatDateToEnglish = (dateString: string): string => {
+    try {
+      // 날짜 형식이 "YYYY-MM-DD" 또는 "YYYYMMDD"인 경우를 가정
+      let dateStr = dateString
+      if (dateString.length === 8 && !dateString.includes('-')) {
+        // YYYYMMDD 형식을 YYYY-MM-DD로 변환
+        dateStr = `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`
+      }
+      const date = new Date(dateStr)
+      if (isNaN(date.getTime())) {
+        return dateString // 파싱 실패 시 원본 반환
+      }
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    } catch {
+      return dateString // 에러 발생 시 원본 반환
+    }
+  }
+
+  const formatDateToNumericEnglish = (dateString: string): string => {
+    try {
+      // 날짜 형식이 "YYYY-MM-DD" 또는 "YYYYMMDD"인 경우를 가정
+      let dateStr = dateString
+      if (dateString.length === 8 && !dateString.includes('-')) {
+        // YYYYMMDD 형식을 YYYY-MM-DD로 변환
+        dateStr = `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`
+      }
+      const date = new Date(dateStr)
+      if (isNaN(date.getTime())) {
+        return dateString // 파싱 실패 시 원본 반환
+      }
+      // 월: 영어 약어, 일: 숫자, 년: 생략 (예: "Jan 15")
+      const month = date.toLocaleDateString('en-US', { month: 'short' })
+      const day = date.getDate()
+      return `${month} ${day}`
+    } catch {
+      return dateString // 에러 발생 시 원본 반환
+    }
+  }
+
+  const dateOrderList: {
+    id: string
+    date: string
+    originalDate: string
+    list: HistoryStudy[]
+  }[] = []
   if (!history.isError && history.data) {
     history.data.pages.forEach((page) => {
       page.history.forEach((history, i) => {
         if (i === 0) {
           dateOrderList.push({
             id: `${history.completeDate}-${page.history.length}-${history.studyId}-${history.no}`,
-            date: history.completeDate,
+            date: formatDateToEnglish(history.completeDate),
+            originalDate: history.completeDate,
             list: [history],
           })
         } else if (
-          dateOrderList[dateOrderList.length - 1].date === history.completeDate
+          dateOrderList[dateOrderList.length - 1].originalDate ===
+          history.completeDate
         ) {
           dateOrderList[dateOrderList.length - 1].list.push(history)
         } else {
           dateOrderList.push({
             id: `${history.completeDate}-${page.history.length}-${history.studyId}-${history.no}`,
-            date: history.completeDate,
+            date: formatDateToEnglish(history.completeDate),
+            originalDate: history.completeDate,
             list: [history],
           })
         }
@@ -623,7 +674,9 @@ function StudyResultHistoryList({
                           title={history.title}
                           levelName={history.levelName}
                           src={history.surfaceImagePath}
-                          studyDate={history.completeDate}
+                          studyDate={formatDateToNumericEnglish(
+                            history.completeDate,
+                          )}
                           totalScore={history.average}
                           stepScore1={history.scoreStep1}
                           stepScore2={history.scoreStep2}

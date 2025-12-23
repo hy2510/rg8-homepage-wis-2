@@ -37,6 +37,13 @@ export const ChallengeTrophyCardStyle = styled.div`
     width: 72px;
     height: auto;
   }
+
+  .challenge-award-name {
+    font-family: var(--font-family-secondary);
+    font-weight: 700;
+    font-size: var(--font-size-medium);
+    color: var(--font-color-secondary);
+  }
 `
 
 export const DailyGoalCardStyle = styled.div`
@@ -378,6 +385,7 @@ export const ReadingUnitCardStyle = styled.div`
     position: relative;
 
     .text {
+      font-family: var(--font-family-secondary);
       font-size: var(--font-size-xlarge);
       font-weight: bold;
       color: var(--font-color-primary);
@@ -517,8 +525,24 @@ export const StreakStatusStyle = styled.div`
           width: 50px;
           height: 50px;
           opacity: 1;
+          animation: pulsate-fwd 1.5s ease-in-out infinite both;
         }
       }
+    }
+  }
+
+  @keyframes pulsate-fwd {
+    0% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+    }
+    50% {
+      -webkit-transform: scale(1.1);
+      transform: scale(1.1);
+    }
+    100% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
     }
   }
 
@@ -1386,8 +1410,8 @@ export const DailyRGBookItemStyle = styled.div<{
   width: 100%;
   min-height: 150px;
   border-radius: 20px;
-  border: 1px solid var(--line-color-primary);
-  box-shadow: 0 3px 0 0 var(--line-color-primary);
+  border: ${({ isCompleted }) =>
+    !isCompleted ? 'none' : '1px solid var(--line-color-primary)'};
   padding: 10px;
   margin-top: 20px;
   margin-bottom: 3px;
@@ -1662,6 +1686,7 @@ export const DailyRGCourseStyle = styled.div<{
   isCurrent?: boolean
   bgColor?: string
   progressColor?: string
+  isCompleted?: boolean
 }>`
   overflow: hidden;
   width: 100%;
@@ -1698,6 +1723,18 @@ export const DailyRGCourseStyle = styled.div<{
     background-repeat: no-repeat;
     animation: var(--animation-glass-complete);
     z-index: 0;
+  }
+
+  .menu-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    position: relative;
+    border-left: 1.5px solid;
+    border-color: ${({ isCurrent, isCompleted }) =>
+      isCurrent || isCompleted ? '#ffffff70' : 'var(--line-color-primary)'};
   }
 `
 
@@ -2308,11 +2345,15 @@ export const BookItemStyle = styled.div<{ level: string }>`
   }
 `
 
-export const BookListDateGroupStyle = styled.div`
-  margin-bottom: 10px;
+export const BookListDateGroupStyle = styled.div<{ isTodoList?: boolean }>`
+  margin-bottom: ${({ isTodoList }) => (isTodoList ? '0' : '10px')};
+  padding-bottom: ${({ isTodoList }) => (isTodoList ? '20px' : '0')};
+  border-bottom: ${({ isTodoList }) =>
+    isTodoList ? '1px solid var(--line-color-primary)' : 'none'};
 
   &:last-child {
     margin-bottom: 0;
+    border-bottom: none;
   }
 
   .divider {
@@ -3822,7 +3863,7 @@ export const StudentEditCardButton = styled.div`
 
 export const StudentInfoCardStyle = styled.div`
   width: 100%;
-  min-height: 170px;
+  height: 170px;
   background-color: var(--color-light-blue-opacity-10);
   background-image: url(${Assets.Icon.glossyPoint.src});
   background-size: 15px;
@@ -3836,6 +3877,7 @@ export const StudentInfoCardStyle = styled.div`
 
   ${tabletS(`
     padding: 0;
+    height: fit-content;
   `)}
 
   &::before {
@@ -3894,14 +3936,15 @@ export const StudentInfoCardStyle = styled.div`
   .info-container {
     width: calc(100% - 280px);
     height: 100%;
-    min-height: 100px;
+    min-height: 70px;
     padding-left: 280px;
     position: relative;
     z-index: 3;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
 
     ${tabletS(`
       width: 100%;
@@ -3909,9 +3952,19 @@ export const StudentInfoCardStyle = styled.div`
       padding-bottom: 30px;
       margin: 0 auto;
       align-items: center;
-      gap: 10px;
       background-color: #fff;
     `)}
+
+    .info-content-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+
+      ${tabletS(`
+        align-items: center;
+      `)}
+    }
 
     .user-name {
       font-family: var(--font-family-secondary);
@@ -4000,7 +4053,7 @@ export const StudentProfileCardStyle = styled.div`
   .body {
     display: grid;
     grid-template-columns: 1fr 100px;
-    gap: 5px;
+    gap: 10px;
 
     .label {
       font-family: var(--font-family-rg-b);

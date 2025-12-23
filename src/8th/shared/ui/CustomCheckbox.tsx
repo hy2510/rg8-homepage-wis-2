@@ -15,6 +15,7 @@ interface CustomCheckboxProps {
   checked?: boolean
   onChange: (checked: boolean) => void
   label?: string
+  disabled?: boolean
 }
 
 export default function CustomCheckbox({
@@ -22,17 +23,21 @@ export default function CustomCheckbox({
   checked = false,
   onChange,
   label,
+  disabled = false,
 }: CustomCheckboxProps) {
   const handleToggle = () => {
+    if (disabled) return
     onChange(!checked)
   }
 
   const onClickCheckbox = (event: React.MouseEvent) => {
+    if (disabled) return
     event.preventDefault()
     handleToggle()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault()
       handleToggle()
@@ -46,13 +51,16 @@ export default function CustomCheckbox({
         id={id}
         checked={checked}
         onChange={handleToggle}
+        disabled={disabled}
       />
       <CheckboxStyle
         checked={checked}
+        disabled={disabled}
         onClick={onClickCheckbox}
         role="checkbox"
         aria-checked={checked}
-        tabIndex={0}
+        aria-disabled={disabled}
+        tabIndex={disabled ? -1 : 0}
         onKeyDown={handleKeyDown}>
         {checked && (
           <Image

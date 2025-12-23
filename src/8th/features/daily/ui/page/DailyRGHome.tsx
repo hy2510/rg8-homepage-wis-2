@@ -317,16 +317,18 @@ function DailyRGContentList({
   >('down')
 
   const [isItemHeightCatched, setItemHeightCatched] = useState(false)
+
+  // stageId, currentSectionId, focusBookLevelRoundId가 변경될 때마다 타겟 위치 재계산을 위해 리셋
   useLayoutEffect(() => {
     const prevScrollRestoreVal = window.history.scrollRestoration
     window.history.scrollRestoration = 'manual'
-    window.scrollTo(0, 0)
+    // 스크롤을 맨 위로 이동시키지 않고, 타겟 위치로 이동하도록 함
     setItemHeightCatched(false)
 
     return () => {
       window.history.scrollRestoration = prevScrollRestoreVal
     }
-  }, [stageId])
+  }, [stageId, currentSectionId, focusBookLevelRoundId])
 
   const currentTargetInfo = useMemo(() => {
     if (!isItemHeightCatched) {
@@ -334,58 +336,35 @@ function DailyRGContentList({
     }
 
     const element = focusTargetRef.current
-    const elementBox = element?.getBoundingClientRect()
-    const style = element ? window.getComputedStyle(element) : undefined
+    if (!element) {
+      return undefined
+    }
 
-    // Offset: 첫번째 아이템의 시작 위치
-    const offset = window.scrollY + (elementBox?.top ?? 0)
+    const elementBox = element.getBoundingClientRect()
+    const style = window.getComputedStyle(element)
 
-    const focusCourse = focusCourseRef.current
-    const focusCourseBox = focusCourse?.getBoundingClientRect()
-    const courseStyle = focusCourse
-      ? window.getComputedStyle(focusCourse)
-      : undefined
-
-    // 코스의 헤더 높이 (마진 포함)
-    const focusHeight =
-      focusCourseBox?.height ??
-      0 +
-        (parseInt(courseStyle?.marginTop ?? '0') ?? 0) +
-        (parseInt(courseStyle?.marginBottom ?? '0') ?? 0)
+    // 타겟 요소의 절대 위치 (절대 상단 위치)
+    const targetElementTop = window.scrollY + elementBox.top
 
     // 아이템 박스의 높이 (마진 포함)
     const boxHeight =
-      (elementBox?.height ?? 0) +
-      (parseInt(style?.marginTop ?? '0') ?? 0) +
-      (parseInt(style?.marginBottom ?? '0') ?? 0)
+      elementBox.height +
+      (parseInt(style.marginTop ?? '0') ?? 0) +
+      (parseInt(style.marginBottom ?? '0') ?? 0)
 
-    // 아이템 박스의 마진 탑
-    const boxMarginTop = parseInt(style?.marginTop ?? '0') ?? 0
+    // 타겟 요소의 절대 중앙 위치
+    const targetElementCenter = targetElementTop + boxHeight / 2
 
-    // 상단 고정 헤더 높이 (모바일에만 존재)
-    const headerHeight = isTopHeaderVisible ? 70 : 0
-
-    // 첫번째 아이템의 시작 위치 (offset - 코스 헤더 높이 - 상단 고정 헤더 높이 - 아이템 박스의 마진 탑)
-    const firstTopPosition = offset - focusHeight - headerHeight - boxMarginTop
-
-    const moveY = firstTopPosition + focusBookIndex * boxHeight
-
-    const moveYCenter =
-      offset +
-      focusBookIndex * boxHeight +
-      headerHeight +
-      boxHeight / 2 -
-      (window.innerHeight + focusHeight) / 2
+    // 화면 정중앙에 오도록 스크롤 위치 계산
+    // 화면 중앙 = window.innerHeight / 2
+    // 스크롤 위치 = 타겟 요소 중앙 - 화면 중앙
+    const moveYCenter = targetElementCenter - window.innerHeight / 2
 
     return {
-      topOffset: offset,
-      courseHeight: focusHeight,
-      headerHeight: headerHeight,
-      itemTopMargin: boxMarginTop,
       itemHeight: boxHeight,
       destinationY: moveYCenter,
     }
-  }, [focusBookIndex, isTopHeaderVisible, isItemHeightCatched])
+  }, [isItemHeightCatched])
 
   const moveToFocusTarget = useCallback(
     (behavior: 'instant' | 'smooth' | 'none') => {
@@ -401,10 +380,29 @@ function DailyRGContentList({
   )
 
   useEffect(() => {
-    if (focusTargetRef.current && currentTargetInfo?.destinationY) {
-      window.requestAnimationFrame(() => moveToFocusTarget('instant'))
+    if (
+      focusTargetRef.current &&
+      currentTargetInfo?.destinationY !== undefined &&
+      !isBookListLoading &&
+      !isSectionListLoading
+    ) {
+      // 이미지 로드 후 DOM이 완전히 렌더링되도록 여러 프레임 대기
+      const timeoutId = setTimeout(() => {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            moveToFocusTarget('instant')
+          })
+        })
+      }, 100)
+
+      return () => clearTimeout(timeoutId)
     }
-  }, [moveToFocusTarget, currentTargetInfo?.destinationY])
+  }, [
+    moveToFocusTarget,
+    currentTargetInfo?.destinationY,
+    isBookListLoading,
+    isSectionListLoading,
+  ])
 
   useEffect(() => {
     if (!currentTargetInfo?.itemHeight || !currentTargetInfo?.destinationY) {
@@ -639,7 +637,7 @@ function DailyRGContentList({
                     return (
                       <DailyRGBookItem
                         key={`${book.no}-${book.levelRoundId}`}
-                        ref={i === 0 ? focusTargetRef : undefined}
+                        ref={i === focusBookIndex ? focusTargetRef : undefined}
                         no={book.no}
                         imgUrl={imagePath}
                         title={book.topicTitle}
@@ -653,7 +651,7 @@ function DailyRGContentList({
                           onStartStudyClick()
                         }}
                         onImageLoaded={
-                          i === 0 && !isItemHeightCatched
+                          i === focusBookIndex && !isItemHeightCatched
                             ? (isSuccess) => {
                                 if (isSuccess) {
                                   setItemHeightCatched(true)

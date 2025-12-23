@@ -70,7 +70,7 @@ export default function ReadingUnitCard({ point }: { point: number }) {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   return (
-    <WidgetBoxStyle>
+    <WidgetBoxStyle height="168px">
       <ReadingUnitCardStyle>
         <CommonTitleStyle onClick={() => setIsModalOpen(true)}>
           {t('t8th200')}
