@@ -317,6 +317,17 @@ function DailyRGContentList({
   >('down')
 
   const [isItemHeightCatched, setItemHeightCatched] = useState(false)
+  const [scrollRetryCount, setScrollRetryCount] = useState(0)
+
+  // 데이터가 준비되었는지 확인
+  const isDataReady =
+    !isBookListLoading &&
+    !isSectionListLoading &&
+    !!currentSectionId &&
+    !!focusBookLevelRoundId &&
+    !!bookList &&
+    bookList.book &&
+    bookList.book.length > 0
 
   // stageId, currentSectionId, focusBookLevelRoundId가 변경될 때마다 타겟 위치 재계산을 위해 리셋
   useLayoutEffect(() => {
@@ -324,6 +335,7 @@ function DailyRGContentList({
     window.history.scrollRestoration = 'manual'
     // 스크롤을 맨 위로 이동시키지 않고, 타겟 위치로 이동하도록 함
     setItemHeightCatched(false)
+    setScrollRetryCount(0)
 
     return () => {
       window.history.scrollRestoration = prevScrollRestoreVal
@@ -369,39 +381,79 @@ function DailyRGContentList({
   const moveToFocusTarget = useCallback(
     (behavior: 'instant' | 'smooth' | 'none') => {
       if (behavior === 'none' || !currentTargetInfo?.destinationY) {
-        return
+        return false
       }
-      window.scrollTo({
-        top: currentTargetInfo.destinationY,
-        behavior: behavior,
-      })
+      if (!isDataReady || !focusTargetRef.current) {
+        return false
+      }
+      try {
+        window.scrollTo({
+          top: currentTargetInfo.destinationY,
+          behavior: behavior,
+        })
+        return true
+      } catch (error) {
+        console.error('Scroll failed:', error)
+        return false
+      }
     },
-    [currentTargetInfo?.destinationY],
+    [currentTargetInfo?.destinationY, isDataReady],
   )
 
+  // 이미지 로드 타임아웃 처리
   useEffect(() => {
-    if (
-      focusTargetRef.current &&
-      currentTargetInfo?.destinationY !== undefined &&
-      !isBookListLoading &&
-      !isSectionListLoading
-    ) {
-      // 이미지 로드 후 DOM이 완전히 렌더링되도록 여러 프레임 대기
-      const timeoutId = setTimeout(() => {
-        window.requestAnimationFrame(() => {
-          window.requestAnimationFrame(() => {
-            moveToFocusTarget('instant')
-          })
-        })
-      }, 100)
-
-      return () => clearTimeout(timeoutId)
+    if (!isDataReady || !focusTargetRef.current || isItemHeightCatched) {
+      return
     }
+
+    // 데이터가 준비되었지만 일정 시간 내에 이미지가 로드되지 않은 경우 강제로 높이 캡처
+    const timeoutId = setTimeout(() => {
+      if (focusTargetRef.current && !isItemHeightCatched) {
+        setItemHeightCatched(true)
+      }
+    }, 2000) // 2초 후 강제 설정
+
+    return () => clearTimeout(timeoutId)
+  }, [isDataReady, isItemHeightCatched])
+
+  // 자동 스크롤 실행 및 재시도 로직
+  useEffect(() => {
+    if (!isDataReady || !focusTargetRef.current) {
+      return
+    }
+
+    if (currentTargetInfo?.destinationY === undefined) {
+      // 데이터는 준비되었지만 타겟 정보가 없는 경우 재시도
+      if (scrollRetryCount < 5) {
+        const retryTimeoutId = setTimeout(() => {
+          setScrollRetryCount((prev) => prev + 1)
+        }, 500)
+        return () => clearTimeout(retryTimeoutId)
+      }
+      return
+    }
+
+    // 이미지 로드 후 DOM이 완전히 렌더링되도록 여러 프레임 대기
+    const timeoutId = setTimeout(() => {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          const success = moveToFocusTarget('instant')
+          if (!success && scrollRetryCount < 5) {
+            // 스크롤 실패 시 재시도
+            setTimeout(() => {
+              setScrollRetryCount((prev) => prev + 1)
+            }, 500)
+          }
+        })
+      })
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
   }, [
     moveToFocusTarget,
     currentTargetInfo?.destinationY,
-    isBookListLoading,
-    isSectionListLoading,
+    isDataReady,
+    scrollRetryCount,
   ])
 
   useEffect(() => {
@@ -655,6 +707,11 @@ function DailyRGContentList({
                             ? (isSuccess) => {
                                 if (isSuccess) {
                                   setItemHeightCatched(true)
+                                } else if (scrollRetryCount < 3) {
+                                  // 이미지 로드 실패 시 재시도
+                                  setTimeout(() => {
+                                    setScrollRetryCount((prev) => prev + 1)
+                                  }, 500)
                                 }
                               }
                             : undefined
@@ -722,11 +779,17 @@ function DailyRGContentList({
 
       <Gap size={100} />
 
-      {jumpButtonState && (
+      {jumpButtonState && isDataReady && (
         <QuickJumpButtonStyle
           isVisible={true}
           onClick={() => {
-            moveToFocusTarget('smooth')
+            const success = moveToFocusTarget('smooth')
+            if (!success && currentTargetInfo?.destinationY) {
+              // 스크롤 실패 시 재시도
+              setTimeout(() => {
+                moveToFocusTarget('smooth')
+              }, 300)
+            }
           }}>
           {jumpButtonState === 'up' && (
             <Image
