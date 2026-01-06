@@ -38,11 +38,13 @@ export default function DailyRGLevel({
   const currentIndex = stages.findIndex(
     (stage) => stage.stageId === currentStageId,
   )
+  const currentStage = stages.find((stage) => stage.stageId === currentStageId)
 
   return (
     <DailyRGLevelStyle onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-      <TextStyle fontSize="xlarge">Stage</TextStyle>
-      <TextStyle fontSize="xlarge">{currentStageId}</TextStyle>
+      <TextStyle fontSize="xlarge">
+        {currentStage?.stageName || currentStageId}
+      </TextStyle>
       <Image
         src={Assets.Icon.chevronDownGray}
         alt="chevron-down"

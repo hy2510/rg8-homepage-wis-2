@@ -19,6 +19,7 @@ import {
 import { useStudentAvatarList } from '@/8th/features/student/service/setting-query'
 import { useStudent } from '@/8th/features/student/service/student-query'
 import StudentProfileCard from '@/8th/features/student/ui/component/StudentProfileCard'
+import LevelGuidancePopup from '@/8th/features/student/ui/modal/LevelGuidancePopup'
 import { useTodoList } from '@/8th/features/todo/service/todo-query'
 import AuthContextProvider from '@/8th/shared/auth/AuthContext'
 import { GuardStudent } from '@/8th/shared/auth/GuardAuth'
@@ -35,6 +36,7 @@ import {
   MobileTopPlaceholderStyle,
   RightContainerStyle,
 } from '@/8th/shared/styled/SharedStyled'
+import { GoTo7thButton, LogoutButton } from '@/8th/shared/ui/Buttons'
 import FooterMenu from '@/8th/shared/ui/FooterMenu'
 import GlobalNavBar from '@/8th/shared/ui/GlobalNavBar'
 import SITE_PATH from '@/app/site-path'
@@ -100,7 +102,7 @@ const PAGE_CONFIG = {
     icon: Assets.Icon.Gnb.ebooks,
   },
   [SITE_PATH.NW82.PB]: {
-    title: 'PB',
+    title: 'P-BOOK QUIZ',
     icon: Assets.Icon.Gnb.bookQuiz,
   },
   [SITE_PATH.NW82.ACTIVITY]: {
@@ -224,6 +226,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
   const isDesktop = useIsDesktop()
 
+  // 레벨 가이던스 팝업 열기
+  const [isLevelGuidancePopupOpen, setIsLevelGuidancePopupOpen] = useState(true)
+
   return (
     <>
       <GlobalNavBar />
@@ -310,6 +315,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                 settingType={dailyType}
               />
               <ReadingUnitCard point={point} />
+              <LogoutButton />
+              <GoTo7thButton />
             </RightContainerStyle>
 
             {isRightContainerOpen && !isDesktop && (
@@ -323,6 +330,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           {/* 모달 */}
           {isCalendarModalOpen && (
             <CalendarModal onCloseModal={() => setIsCalendarModalOpen(false)} />
+          )}
+          {isLevelGuidancePopupOpen && (
+            <LevelGuidancePopup onCloseModal={() => {}} />
           )}
         </ContentsWrapperStyle>
         <FooterMenu />

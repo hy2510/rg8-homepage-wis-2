@@ -410,6 +410,13 @@ export const StartButtonStyle = styled.button<{ isMobile?: boolean }>`
     box-shadow: 0 1px 0 0 var(--color-red-medium-shadow);
   }
 
+  &.mobile-activated {
+    width: calc(100% - 10px);
+    margin: 5px;
+    margin-bottom: 10px;
+    margin-top: 0;
+  }
+
   &.animated,
   &.mobile-animated {
     position: relative;
@@ -557,6 +564,38 @@ export const MoreHorizontalButtonStyle = styled.button`
   }
 `
 
+export const LogoutButtonStyle = styled.button`
+  cursor: pointer;
+  width: 100%;
+  min-height: 46px;
+  background-color: var(--color-gray-light);
+  font-size: var(--font-size-medium);
+  font-family: var(--font-family-secondary);
+  font-weight: 700;
+  color: var(--font-color-secondary);
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+  &:hover {
+    background-color: var(--color-gray-medium);
+  }
+  &:active {
+    transform: translateY(2px);
+  }
+`
+
+export const GoTo7thButtonStyle = styled.div`
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  font-size: var(--font-size-small);
+  font-family: var(--font-family-secondary);
+  font-weight: 700;
+  color: var(--font-color-secondary);
+`
+
 export const HiddenCheckboxStyle = styled.input`
   width: fit-content;
   position: absolute;
@@ -564,19 +603,19 @@ export const HiddenCheckboxStyle = styled.input`
   pointer-events: none;
 `
 
-export const CheckboxStyle = styled.div<{ checked: boolean; disabled?: boolean }>`
+export const CheckboxStyle = styled.div<{
+  checked: boolean
+  disabled?: boolean
+}>`
   width: 20px;
   height: 20px;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  border: 2px solid ${({ disabled }) =>
-    disabled ? 'var(--line-color-gray)' : 'var(--font-color-light-blue)'};
+  border: 2px solid
+    ${({ disabled }) =>
+      disabled ? 'var(--line-color-gray)' : 'var(--font-color-light-blue)'};
   border-radius: 5px;
   background-color: ${({ checked, disabled }) =>
-    disabled
-      ? '#f5f5f5'
-      : checked
-        ? 'var(--font-color-light-blue)'
-        : '#fff'};
+    disabled ? '#f5f5f5' : checked ? 'var(--font-color-light-blue)' : '#fff'};
   position: relative;
   transition: all 0.2s ease;
   display: flex;

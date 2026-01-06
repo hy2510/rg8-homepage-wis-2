@@ -1132,3 +1132,36 @@ button {
   justify-content: center;
   overflow: hidden;
 }
+
+.go_to_8th_bar {
+  width: 100%;
+  background-color: var(--light);
+  text-align: center;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  .title {
+    font-size: var(--text-s);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    .icon {
+      width: 18px;
+      height: 18px;
+      background-image: url('/src/images/arrow-icons/arrow-left.svg');
+      background-size: 18px;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: rotate(180deg);
+    }
+  }
+  .description {
+    font-size: var(--text-xs);
+    color: var(--gray1);
+    font-weight: 500;
+  }
+}

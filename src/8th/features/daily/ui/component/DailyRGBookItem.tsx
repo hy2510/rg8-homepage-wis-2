@@ -87,8 +87,8 @@ export default function DailyRGBookItem({
           <Image
             src={imgUrl}
             alt="thumbnail"
-            width={100}
-            height={100}
+            width={125}
+            height={180}
             onLoad={onImageLoadEvent}
             onError={onImageErrorEvent}
           />
@@ -124,7 +124,7 @@ export default function DailyRGBookItem({
             <StartButton
               onClick={onStart}
               isMobile
-              className="mobile-animated"
+              className="mobile-animated mobile-activated"
             />
           )}
         </div>

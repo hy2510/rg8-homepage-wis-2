@@ -14,7 +14,8 @@ import SettingCheckSelector from '@/8th/features/student/ui/component/SettingChe
 import SettingHeader from '@/8th/features/student/ui/component/SettingHeader'
 import SettingImageSelector from '@/8th/features/student/ui/component/SettingImageSelector'
 import SettingRadioSelector from '@/8th/features/student/ui/component/SettingRadioSelector'
-import { BoxStyle } from '@/8th/shared/ui/Misc'
+import CustomCheckbox from '@/8th/shared/ui/CustomCheckbox'
+import { BoxStyle, TextStyle } from '@/8th/shared/ui/Misc'
 import { SubPageNavHeader } from '@/8th/shared/ui/SubPageNavHeader'
 import SITE_PATH from '@/app/site-path'
 import useTranslation from '@/localization/client/useTranslations'
@@ -86,6 +87,7 @@ export default function AccountSetting() {
           hint={data.student.viewStep2Skip || false}
           chance={data.student.viewStep3Hint || false}
         />
+        <LevelGuidanceSetting levelChange={true} tryOtherLevel={true} />
       </BoxStyle>
     </>
   )
@@ -431,6 +433,122 @@ function QuizHelperSetting({
         list={StudyQuizHelperOptions}
         onChange={onChangeItem}
       />
+    </>
+  )
+}
+
+function LevelGuidanceSetting({
+  levelChange,
+  tryOtherLevel,
+}: {
+  levelChange: boolean
+  tryOtherLevel: boolean
+}) {
+  // @Language 'common'
+  const { t } = useTranslation()
+
+  const LevelGuidanceOptions = [
+    {
+      value: 'levelChange',
+      label: '레벨 변경 안내',
+      description:
+        '현재 학습 레벨과 다른 학습을 선택하면 안내 메시지가 표시됩니다.',
+    },
+    {
+      value: 'tryOtherLevel',
+      label: '학습 레벨 자동 설정',
+      description:
+        '다른 레벨의 학습을 완료하면 기본 학습 레벨 변경을 제안합니다.',
+    },
+  ]
+
+  const { mutate: changeStudySettings } = useChangeStudySettings({
+    onSuccess: () => {
+      activeSaved()
+      setValue([...chooseValue])
+    },
+  })
+  const [value, setValue] = useState<string[]>(
+    [levelChange ? 'levelChange' : '', tryOtherLevel ? 'tryOtherLevel' : '']
+      .filter((item) => !!item)
+      .sort(),
+  )
+  const [chooseValue, setChooseValue] = useState<string[]>([...value])
+  const { isSaved, activeSaved, clearSaved } = useSavedMarker()
+
+  const onSaveClick = () => {
+    const levelChange =
+      value.includes('levelChange') === chooseValue.includes('levelChange')
+        ? 'none'
+        : chooseValue.includes('levelChange')
+    const tryOtherLevel =
+      value.includes('tryOtherLevel') === chooseValue.includes('tryOtherLevel')
+        ? 'none'
+        : chooseValue.includes('tryOtherLevel')
+    changeStudySettings({ hint: levelChange, chance: tryOtherLevel })
+  }
+
+  const onCancelClick = () => {
+    setChooseValue(value)
+  }
+
+  const handleChange = (optionValue: string, checked: boolean) => {
+    if (isSaved) {
+      clearSaved()
+    }
+    const newValues = [...chooseValue]
+    if (checked) {
+      if (!newValues.includes(optionValue)) {
+        newValues.push(optionValue)
+      }
+    } else {
+      if (newValues.includes(optionValue)) {
+        newValues.splice(newValues.indexOf(optionValue), 1)
+      }
+    }
+    setChooseValue(newValues.sort())
+  }
+
+  const isChanged = !(
+    chooseValue.length === value.length &&
+    chooseValue.every((item, index) => item === value[index])
+  )
+
+  return (
+    <>
+      <SettingHeader
+        title={'Level Guidance'}
+        isChanged={isChanged}
+        isSaved={isSaved}
+        onSave={onSaveClick}
+        onCancel={onCancelClick}
+      />
+      <BoxStyle display="flex" flexDirection="column" gap={20} padding="20px">
+        {LevelGuidanceOptions.map((option) => (
+          <BoxStyle
+            key={option.value}
+            display="flex"
+            flexDirection="column"
+            gap={8}>
+            <CustomCheckbox
+              id={option.value}
+              checked={chooseValue.includes(option.value)}
+              onChange={(checked) => handleChange(option.value, checked)}
+              label={option.label}
+            />
+            {option.description && (
+              <BoxStyle padding="0 0 0 32px">
+                <TextStyle
+                  fontFamily="sans"
+                  fontSize="small"
+                  fontColor="secondary">
+                  {option.description}
+                </TextStyle>
+              </BoxStyle>
+            )}
+          </BoxStyle>
+        ))}
+      </BoxStyle>
     </>
   )
 }

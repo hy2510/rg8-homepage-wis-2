@@ -1426,6 +1426,7 @@ export const DailyRGBookItemStyle = styled.div<{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 0;
   `)}
 
   &.current-book {
@@ -1541,14 +1542,21 @@ export const DailyRGBookItemStyle = styled.div<{
     .prek-thumbnail {
       border-radius: 15px;
       background-color: var(--color-gray-strong);
+      overflow: hidden;
+
+      ${phone(`
+        width: 100%;
+        border-radius: 18px 18px 0 0;
+      `)}
 
       img {
         display: block;
-        width: 100%;
-        max-width: 260px;
-        min-height: 100px;
-        height: auto;
-        border-radius: 15px;
+        min-width: 300px;
+        max-width: 300px;
+        min-height: 180px;
+        max-height: 180px;
+        object-fit: cover;
+        object-position: center;
         background-color: var(--color-gray-medium);
         filter: ${({ isCurrent, isCompleted }) =>
           isCurrent || isCompleted ? 'none' : 'grayscale(100%)'};
@@ -1556,32 +1564,40 @@ export const DailyRGBookItemStyle = styled.div<{
           isCurrent || isCompleted ? 1 : 0.6};
 
         ${phone(`
-          max-width: 100%;
-          min-height: 150px;
+          width: 100%;
+          height: auto;
+          object-fit: cover;
+          object-position: center;
+          min-width: none;
+          max-width: none;
+          min-height: 180px;
+          max-height: 180px;
         `)}
       }
     }
 
     .book-cover {
       border-radius: 15px;
-      background-color: var(--color-gray-strong);
+      /* background-color: var(--color-gray-strong); */
+
+      ${phone(`
+        padding: 5px;
+      `)}
 
       img {
         display: block;
-        width: 100%;
+        min-width: 125px;
         max-width: 125px;
-        height: auto;
+        min-height: 180px;
+        max-height: 180px;
+        object-fit: cover;
+        object-position: center;
         border-radius: 15px;
         background-color: var(--color-gray-medium);
         filter: ${({ isCurrent, isCompleted }) =>
           isCurrent || isCompleted ? 'none' : 'grayscale(100%)'};
         opacity: ${({ isCurrent, isCompleted }) =>
           isCurrent || isCompleted ? 1 : 0.6};
-
-        ${phone(`
-          border-radius: 10px;
-          min-width: 105px;
-        `)}
       }
     }
   }
@@ -1597,7 +1613,7 @@ export const DailyRGBookItemStyle = styled.div<{
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      padding-left: 5px;
+      padding: 10px;
       gap: 0;
     `)}
 

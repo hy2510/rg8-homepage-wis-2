@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 export default function useSwing2AppConnect({
   platform,
   updatePlatform,
-  iOSBackgroundColor = '#f0f2f5',
+  iOSBackgroundColor = '#ffffff',
 }: {
   platform: string
   updatePlatform: (platform: {

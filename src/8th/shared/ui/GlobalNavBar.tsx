@@ -98,7 +98,7 @@ export default function GlobalNavBar() {
 
         <MenuItem
           icon={Assets.Icon.Gnb.bookQuiz}
-          text="BOOK QUIZ"
+          text="P-BOOK QUIZ"
           isActive={pathname.includes(SITE_PATH.NW82.PB)}
           linkUrl={SITE_PATH.NW82.PB}
         />

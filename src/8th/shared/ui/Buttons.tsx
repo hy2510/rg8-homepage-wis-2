@@ -1,9 +1,13 @@
 'use client'
 
 import { Assets } from '@/8th/assets/asset-library'
+import SITE_PATH from '@/app/site-path'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
+  GoTo7thButtonStyle,
+  LogoutButtonStyle,
   MoreHorizontalButtonStyle,
   RoundedFullButtonStyle,
   StartButtonStyle,
@@ -109,5 +113,28 @@ export function MoreHorizontalButton({
         position={'topRight'}
       />
     </MoreHorizontalButtonStyle>
+  )
+}
+
+export function LogoutButton({ onClick }: { onClick?: () => void }) {
+  return <LogoutButtonStyle onClick={onClick}>로그아웃</LogoutButtonStyle>
+}
+
+export function GoTo7thButton({ onClick }: { onClick?: () => void }) {
+  const router = useRouter()
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick()
+    } else {
+      // 7차 홈 페이지로 이동
+      router.push(SITE_PATH.HOME.MAIN)
+    }
+  }
+
+  return (
+    <GoTo7thButtonStyle onClick={handleClick}>
+      이전 버전으로 돌아가기
+    </GoTo7thButtonStyle>
   )
 }

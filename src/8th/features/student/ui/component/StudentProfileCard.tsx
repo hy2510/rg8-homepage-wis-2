@@ -58,7 +58,7 @@ export default function StudentProfileCard({
               fontSize="0.75em"
               fontColor="lightBlue"
               padding="0 0 0 2px">
-              Lv.{level} {0 < rank && rank < 1000 ? `/ Rank ${rank}` : ''}
+              Lv. {level} {0 < rank && rank < 1000 ? `/ Rank ${rank}` : ''}
             </TextStyle>
           </BoxStyle>
         </div>

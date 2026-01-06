@@ -65,31 +65,31 @@ export default function DailyRGHome({ stage }: { stage?: string }) {
   }[] =
     stageList?.list.map((item) => {
       let subText = t('t8th287')
-      let stageName = `${item.stageName} (Lv. PK)`
+      let stageName = 'Lv. PK'
       let levelKey = 'PK'
       if (item.minLevel.startsWith('K')) {
         levelKey = 'K'
-        stageName = `${item.stageName} (Lv. K)`
+        stageName = 'Lv. KA · KB · KC'
         subText = t('t8th288')
       } else if (item.minLevel.startsWith('1')) {
         levelKey = '1'
-        stageName = `${item.stageName} (Lv. 1)`
+        stageName = 'Lv. 1A · 1B · 1C'
         subText = t('t8th289')
       } else if (item.minLevel.startsWith('2')) {
         levelKey = '2'
-        stageName = `${item.stageName} (Lv. 2)`
+        stageName = 'Lv. 2A · 2B · 2C'
         subText = t('t8th290')
       } else if (item.minLevel.startsWith('3')) {
         levelKey = '3'
-        stageName = `${item.stageName} (Lv. 3)`
+        stageName = 'Lv. 3A · 3B · 3C'
         subText = t('t8th291')
       } else if (
         item.minLevel.startsWith('4') ||
         item.minLevel.startsWith('5') ||
         item.minLevel.startsWith('6')
       ) {
-        levelKey = '4'
-        stageName = `${item.stageName} (Lv. 4 to 6)`
+        levelKey = '4 to 6'
+        stageName = 'Lv. 4A to 6B'
         subText = t('t8th292')
       }
       return {
@@ -121,17 +121,48 @@ export default function DailyRGHome({ stage }: { stage?: string }) {
     }
 
     if (!targetStageId || stage !== targetStageId) {
-      const userLevel = userSetting.data?.settingLevelName || 'PK'
-      targetStageId = stages[0].stageId
-      targetLevelKey = stages[0].levelKey
+      // Stage 값(인덱스)에 따라 levelKey 매핑
+      const stageMapping: { [key: number]: string } = {
+        0: 'PK',
+        1: 'KA · KB · KC',
+        2: '1A · 1B · 1C',
+        3: '2A · 2B · 2C',
+        4: '3A · 3B · 3C',
+        5: '4A to 6B',
+      }
 
-      for (const s of stages) {
-        if (userLevel.startsWith(s.levelKey)) {
-          targetStageId = s.stageId
-          targetLevelKey = s.levelKey
-          break
+      // stage 파라미터가 있으면 해당 stageId의 인덱스를 찾아서 매핑
+      if (stage) {
+        const stageIndex = stages.findIndex((s) => s.stageId === stage)
+        if (stageIndex >= 0 && stageIndex < stages.length) {
+          const expectedLevelKey = stageMapping[stageIndex]
+          if (expectedLevelKey) {
+            const matchedStage = stages.find(
+              (s) => s.levelKey === expectedLevelKey,
+            )
+            if (matchedStage) {
+              targetStageId = matchedStage.stageId
+              targetLevelKey = matchedStage.levelKey
+            }
+          }
         }
       }
+
+      // 매칭되지 않으면 userLevel 기반으로 매칭
+      if (!targetStageId) {
+        const userLevel = userSetting.data?.settingLevelName || 'PK'
+        targetStageId = stages[0].stageId
+        targetLevelKey = stages[0].levelKey
+
+        for (const s of stages) {
+          if (userLevel.startsWith(s.levelKey)) {
+            targetStageId = s.stageId
+            targetLevelKey = s.levelKey
+            break
+          }
+        }
+      }
+
       if (!!targetStageId) {
         setCurrentStageId({
           stageId: targetStageId!,
@@ -411,7 +442,7 @@ function DailyRGContentList({
       if (focusTargetRef.current && !isItemHeightCatched) {
         setItemHeightCatched(true)
       }
-    }, 2000) // 2초 후 강제 설정
+    }, 500) // 0.5초 후 강제 설정
 
     return () => clearTimeout(timeoutId)
   }, [isDataReady, isItemHeightCatched])
@@ -437,7 +468,7 @@ function DailyRGContentList({
     const timeoutId = setTimeout(() => {
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
-          const success = moveToFocusTarget('instant')
+          const success = moveToFocusTarget('smooth')
           if (!success && scrollRetryCount < 5) {
             // 스크롤 실패 시 재시도
             setTimeout(() => {

@@ -219,30 +219,42 @@ export default function Gheader() {
       )}
       {modalViewName === 'my' && <MyRgModal onCloseModal={onCloseModal} />}
       {logOnStatus && (
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <div
-            style={{
-              position: 'fixed',
-              top: '78px',
-              textDecoration: 'underline',
-              fontWeight: 'bold',
-              color: 'var(--red)',
-              height: '30px',
-              backgroundColor: 'var(--white)',
-              paddingLeft: '20px',
-              paddingRight: '20px',
-              borderRadius: '8px',
-              zIndex: 100,
-            }}>
-            <a href={'/8th/forwarder'}>8차 이동</a>
+        <a href={'/8th/forwarder'}>
+          <div className="go_to_8th_bar">
+            <div className="title">
+              <span>🎉 새로운 버전 Daily RG 사용하기</span>
+              <span className="icon"></span>
+            </div>
+            <div className="description">
+              더 편해진 책 추천 기능을 체험해 보세요!
+            </div>
           </div>
-        </div>
+        </a>
+
+        // <div
+        //   style={{
+        //     width: '100%',
+        //     display: 'flex',
+        //     justifyContent: 'center',
+        //     alignItems: 'center',
+        //   }}>
+        //   <div
+        //     style={{
+        //       position: 'fixed',
+        //       top: '78px',
+        //       textDecoration: 'underline',
+        //       fontWeight: 'bold',
+        //       color: 'var(--red)',
+        //       height: '30px',
+        //       backgroundColor: 'var(--white)',
+        //       paddingLeft: '20px',
+        //       paddingRight: '20px',
+        //       borderRadius: '8px',
+        //       zIndex: 100,
+        //     }}>
+        //     <a href={'/8th/forwarder'}>8차 이동</a>
+        //   </div>
+        // </div>
       )}
     </>
   )
